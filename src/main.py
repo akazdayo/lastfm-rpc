@@ -7,6 +7,7 @@ import os
 
 APIKEY = os.environ.get('LASTFM_APIKEY')
 client_id = os.environ.get('DISCORD_CLIENTID')
+USERNAME = os.environ.get('LASTFM_USERNAME')
 
 old_track = None
 RPC = Presence(client_id, pipe=0)  # Initialize the client class
@@ -23,13 +24,14 @@ def get_artist_image(track):
 
 while True:
     response = httpx.get(
-        f"http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=akazdayo&api_key={APIKEY}&format=json")
+        f"http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={USERNAME}&api_key={APIKEY}&format=json")
     data = response.json()
     recent_tracks = data['recenttracks']['track']
     if recent_tracks:
         now_playing = recent_tracks[0]
         if '@attr' in now_playing and 'nowplaying' in now_playing['@attr'] and now_playing != old_track:
-            # アーティストの画像取得できなくて泣いた笑
+            # アーティストの画像取得できなくて泣いた
+            # 一応できるんだけど、初期画像しか取得できないね。Last.fm側のバグかなぁー？
             # artist_image = get_artist_image(now_playing)
             old_track = now_playing
             message = f"{now_playing['name']} by {
